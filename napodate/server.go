@@ -8,7 +8,7 @@ import (
 )
 
 func NewHTTPServer(ctx context.Context, endpoints Endpoints) http.Handler {
-	r := mux.NewRouter{}
+	r := mux.NewRouter()
 	r.Use(commonMiddleware)
 	r.Methods("GET").Path("/status").Handler(httptransport.NewServer(
 		endpoints.StatusEndpoint,
@@ -22,7 +22,7 @@ func NewHTTPServer(ctx context.Context, endpoints Endpoints) http.Handler {
 	))
 	r.Methods("POST").Path("/validate").Handler(httptransport.NewServer(
 		endpoints.ValidateEndpoint,
-		decodeValidateRequest,
+		decodeValidRequest,
 		encodeResponse,
 	))
 	return r

@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"flag"
-	"napodate"
+	"github.com/rogercoll/microservices/napodate"
 )
 
 func main() {
