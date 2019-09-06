@@ -3,22 +3,55 @@ package main
 import (
 	"context"
     "flag"
-    "fmt"
+	"fmt"
+	"io/ioutil"
     "log"
     "net/http"
-    "os"
+	"os"
+	"bytes"
     "os/signal"
-    "syscall"
-	"github.com/rogercoll/microservices/napodate"
+	"syscall"
+    "encoding/json"
+	"cloud.google.com/go/datastore"
+	"github.com/rogercoll/microservices/datastoregcp"
 )
+
+type SomethingCool struct {
+	EntityName	string `json:"entityName"`
+	datastoreClient *datastore.Client `json:"datastoreClient"`
+}
+
+
+func testRequest() {
+	url := "http://localhost:8081/getObject"
+	ctx := context.Background()
+	clientdb, err := datastore.NewClient(ctx, "rcoll-laboratorio")
+	if err != nil {
+		log.Fatal(err)
+	}
+	test := SomethingCool{EntityName: "Book", datastoreClient: clientdb}
+	b, err := json.Marshal(test)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
+	client := &http.Client{}
+    resp, err := client.Do(req)
+    if err != nil {
+        panic(err)
+    }
+    defer resp.Body.Close()
+
+    fmt.Println("response Status:", resp.Status)
+    fmt.Println("response Headers:", resp.Header)
+    body, _ := ioutil.ReadAll(resp.Body)
+    fmt.Println("response Body:", string(body))
+}
 
 func main() {
 	var (
-		httpAddr = flag.String("http", ":8080", "http listen address")
+		httpAddr = flag.String("http", ":8081", "http listen address")
 	)
 	flag.Parse()
 	ctx := context.Background()
-	srv := napodate.NewService()
+	srv := datastoregcp.NewService()
 	errChan := make(chan error)
 
 	go func() {
@@ -27,17 +60,17 @@ func main() {
 		errChan <- fmt.Errorf("%s", <-c)
 	}()
 
-	endpoints := napodate.Endpoints {
-		GetEndpoint: 	napodate.MakeGetEndpoint(srv),
-		StatusEndpoint:	napodate.MakeStatusEndpoint(srv),
-		ValidateEndpoint:	napodate.MakeValidateEndpoint(srv),
+	endpoints := datastoregcp.Endpoints {
+		GetEndpoint: 	datastoregcp.MakeGetEndpoint(srv),
+		StoreEndpoint:	datastoregcp.MakeStoreEndpoint(srv),
 	}
 
 	go func() {
-		log.Println("Napodate microservice is listening on port: ",*httpAddr)
-		handler := napodate.NewHTTPServer(ctx, endpoints)
+		log.Println("DataStoreGcp microservice is listening on port: ",*httpAddr)
+		handler := datastoregcp.NewHTTPServer(ctx, endpoints)
 		errChan <- http.ListenAndServe(*httpAddr, handler)
 	}()
 
+	testRequest()
 	log.Fatal(<-errChan)
 }
