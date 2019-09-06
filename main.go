@@ -2,7 +2,13 @@ package main
 
 import (
 	"context"
-	"flag"
+    "flag"
+    "fmt"
+    "log"
+    "net/http"
+    "os"
+    "os/signal"
+    "syscall"
 	"github.com/rogercoll/microservices/napodate"
 )
 
@@ -19,7 +25,7 @@ func main() {
 		c := make(chan os.Signal, 1)
 		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 		errChan <- fmt.Errorf("%s", <-c)
-	}
+	}()
 
 	endpoints := napodate.Endpoints {
 		GetEndpoint: 	napodate.MakeGetEndpoint(srv),
@@ -28,10 +34,10 @@ func main() {
 	}
 
 	go func() {
-		log.Println("Napodate microservice is listening on port: "*httpAddr)
+		log.Println("Napodate microservice is listening on port: ",*httpAddr)
 		handler := napodate.NewHTTPServer(ctx, endpoints)
 		errChan <- http.ListenAndServe(*httpAddr, handler)
-	}
+	}()
 
-	log.Fataln(<-errChan)
+	log.Fatal(<-errChan)
 }
