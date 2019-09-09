@@ -1,8 +1,9 @@
 package datastoregcp
 
 import (
+	"fmt"
 	"context"
-    "errors"
+	"errors"
 	"github.com/go-kit/kit/endpoint"
 	"cloud.google.com/go/datastore"
 )
@@ -16,7 +17,7 @@ type Endpoints struct {
 func MakeGetEndpoint(srv Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(getRequest)
-		d, err := srv.GetObject(ctx,req.Db,req.EntityName)
+		d, err := srv.GetObject(ctx,req.ProjID,req.EntityName)
 		if err != nil {
 			return getResponse{d, err.Error()}, nil
 		}
@@ -35,8 +36,10 @@ func MakeStoreEndpoint(srv Service) endpoint.Endpoint {
     }
 }
 
-func (e Endpoints) GetObject(ctx context.Context, db *datastore.Client, entity string) (interface{}, error) {
-	req := getRequest{EntityName: entity, Db: db}
+func (e Endpoints) GetObject(ctx context.Context, projID string, entity string) (interface{}, error) {
+	req := getRequest{ProjID: projID, EntityName: entity}
+	fmt.Println(projID)
+	fmt.Println("hey")
 	resp, err := e.GetEndpoint(ctx, req)
 	if err != nil {
 		return "", err

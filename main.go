@@ -1,6 +1,7 @@
 package main
 
 import (
+	"time"
 	"context"
     "flag"
 	"fmt"
@@ -12,25 +13,20 @@ import (
     "os/signal"
 	"syscall"
     "encoding/json"
-	"cloud.google.com/go/datastore"
 	"github.com/rogercoll/microservices/datastoregcp"
 )
 
 type SomethingCool struct {
+	ProjID	string	`json:"projID"`
 	EntityName	string `json:"entityName"`
-	datastoreClient *datastore.Client `json:"datastoreClient"`
 }
 
 
 func testRequest() {
-	url := "http://localhost:8081/getObject"
-	ctx := context.Background()
-	clientdb, err := datastore.NewClient(ctx, "rcoll-laboratorio")
-	if err != nil {
-		log.Fatal(err)
-	}
-	test := SomethingCool{EntityName: "Book", datastoreClient: clientdb}
+	url := "http://localhost:8081/getObject"	
+	test := SomethingCool{EntityName: "Book", ProjID: "rcoll-laboratorio"}
 	b, err := json.Marshal(test)
+	fmt.Println(string(b))
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
 	client := &http.Client{}
     resp, err := client.Do(req)
@@ -71,6 +67,7 @@ func main() {
 		errChan <- http.ListenAndServe(*httpAddr, handler)
 	}()
 
+	time.Sleep(3*time.Second)
 	testRequest()
 	log.Fatal(<-errChan)
 }

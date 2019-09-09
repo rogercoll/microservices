@@ -8,8 +8,8 @@ import (
 )
 
 type getRequest struct {
+	ProjID	string	`json:"projID"`
 	EntityName	string `json:"entityName"`
-	Db	*datastore.Client	`json:"datastoreClient"`
 }
 
 type getResponse struct {
@@ -30,6 +30,10 @@ type storeResponse struct {
 
 func decodeGetRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	var req getRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		return nil, err
+	}
 	return req, nil
 }
 

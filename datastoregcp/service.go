@@ -1,12 +1,13 @@
 package datastoregcp
 
 import (
+	"fmt"
 	"context"
 	"cloud.google.com/go/datastore"
 )
 
 type Service interface {
-	GetObject(ctx context.Context, db *datastore.Client, entity string) ([]interface{}, error)
+	GetObject(ctx context.Context, projID string, entity string) ([]interface{}, error)
 	StoreObject(ctx context.Context, db *datastore.Client, entityName string, entity interface{}) (string, error)
 }
 
@@ -16,10 +17,16 @@ func NewService() Service {
 	return cDataStoreService{}
 }
 
-func (cDataStoreService) GetObject(ctx context.Context, db *datastore.Client, entity string) ([]interface{}, error) {
+func (cDataStoreService) GetObject(ctx context.Context, projID string, entity string) ([]interface{}, error) {
 	result := make([]interface{},0)
+	fmt.Println(projID)
+	fmt.Println(entity)
+	db, err := datastore.NewClient(ctx, projID)
+	if err != nil {
+		return nil, err
+	}
 	q := datastore.NewQuery(entity)
-	_, err := db.GetAll(ctx, q, result)
+	_, err = db.GetAll(ctx, q, result)
 	if err != nil {
 		return nil, err
 	}
