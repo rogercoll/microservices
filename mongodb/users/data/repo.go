@@ -3,7 +3,7 @@ package data
 import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"github.com/rcoll/microservices/mongodb/users/models"
+	"github.com/rogercoll/microservices/mongodb/users/models"
 )
 
 type UserRepository struct {

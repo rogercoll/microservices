@@ -2,8 +2,7 @@ package endpoints
 
 import (
 	"gopkg.in/mgo.v2"
-
-	"github.com/rcoll/microservices/users/config"
+	"github.com/rogercoll/microservices/mongodb/users/config"
 )
 
 type Context struct {
@@ -15,11 +14,11 @@ func (c *Context) Close() {
 }
 
 func (c *Context) DbCollection(name string) *mgo.Collection {
-	return c.MongoSession.DB(common.AppConfig.Database).C(name)
+	return c.MongoSession.DB(config.AppConfig.Database).C(name)
 }
 
 func NewContext() *Context {
-	session := common.GetSession().Copy()
+	session := config.GetSession().Copy()
 	context := &Context{
 		MongoSession: session,
 	}

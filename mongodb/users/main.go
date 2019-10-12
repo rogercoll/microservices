@@ -3,14 +3,14 @@ package main
 import (
 	"log"
 	"net/http"
-	"github.com/rcoll/microservices/mongodb/users/config"
-	"github.com/rcoll/microservices/mongodb/users/routers"
+	"github.com/rogercoll/microservices/mongodb/users/config"
+	"github.com/rogercoll/microservices/mongodb/users/routes"
 )
 
-func main(){
+
+func main() {
 	config.StartUp()
-	// Get the mux router object
-	router := routers.InitRoutes()
+	router := routes.InitRoutes()
 	server := &http.Server{
 		Addr:    config.AppConfig.Server,
 		Handler: router,

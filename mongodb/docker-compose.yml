@@ -1,0 +1,38 @@
+version: '3.7'
+services:
+  proxy:
+    image: traefik:1.7.4-alpine
+    command:
+      - "--api"
+      - "--docker"
+      - "--docker.watch"
+    labels:
+      - "traefik.frontend.rule=Host:monitor.local"
+      - "traefik.port=8080"
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+  users:
+    build: ./users
+    image: cinema/users
+    labels:
+      - "traefik.backend=users"
+      - "traefik.frontend.rule=Host:users.local"
+
+  db:
+    image: mongo:3.3
+    ports:
+      - target: 27017
+        published: 27017
+        protocol: tcp
+        mode: host
+    volumes:
+      - type: bind
+        source: ./backup
+        target: /backup

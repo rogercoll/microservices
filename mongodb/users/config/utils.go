@@ -43,7 +43,7 @@ var AppConfig configuration
 
 // Initialize AppConfig
 func initConfig() {
-	file, err := os.Open("common/config.json")
+	file, err := os.Open("config/config.json")
 	defer file.Close()
 	if err != nil {
 		log.Fatalf("[loadConfig]: %s\n", err)
