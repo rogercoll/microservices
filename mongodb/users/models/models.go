@@ -9,5 +9,7 @@ type (
 		Id       bson.ObjectId `bson:"_id,omitempty" json:"id"`
 		Name     string        `json:"name"`
 		LastName string        `json:"lastname"`
+		Age		 int		   `json:"age"`
+		PassHash string		   `json:"passhash"`
 	}
 )

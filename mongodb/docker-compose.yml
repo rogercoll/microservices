@@ -20,11 +20,11 @@ services:
         mode: host
   users:
     build: ./users
-    image: cinema/users
+    image: mongodb/users
     labels:
       - "traefik.backend=users"
       - "traefik.frontend.rule=Host:users.local"
-
+  
   db:
     image: mongo:3.3
     ports:
